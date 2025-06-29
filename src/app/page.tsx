@@ -1,35 +1,68 @@
 "use client";
 import React, { useState } from "react";
-import RoomPopup from "../components/RoomPopup";
-import RoomList from "../components/RoomList";
+import defaultIcon from "@/assets/images/default.png";
+import { useWebSocket } from "@/components/WebSocketProvider";
+import PopupFrame from "@/components/popup/PopupFrame";
+import CreatePopup from "@/components/popup/CreatePopup";
+import JoinPopup from "@/components/popup/JoinPopup";
 
 export default function Home() {
   const [popup, setPopup] = useState<"create" | "join" | null>(null);
+
+  // 由 provider 拿出 playerId
+  const { player } = useWebSocket();
 
   const handleOpen = (mode: "create" | "join") => setPopup(mode);
   const handleClose = () => setPopup(null);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200">
-      <h1 className="text-3xl sm:text-5xl font-bold mb-12 text-gray-800 drop-shadow-lg">
-        Party Game
-      </h1>
-      <RoomList />
-      <div className="flex flex-col sm:flex-row gap-8">
-        <button
-          className="px-8 py-4 rounded-lg bg-blue-600 text-white text-xl font-semibold shadow-lg hover:bg-blue-700 transition"
-          onClick={() => handleOpen("create")}
-        >
-          建立房間
-        </button>
-        <button
-          className="px-8 py-4 rounded-lg bg-green-500 text-white text-xl font-semibold shadow-lg hover:bg-green-600 transition"
-          onClick={() => handleOpen("join")}
-        >
-          加入房間
-        </button>
-      </div>
-      <RoomPopup open={!!popup} mode={popup} onClose={handleClose} />
+    <div className="relative min-h-full  ">
+      <h1 className="text-center  text-6xl mb-5">Party Game</h1>
+      {player?.name && (
+        <div>
+          <div className=" border-4 rounded-full  mx-auto w-fit mb-5">
+            <img src={defaultIcon.src} className="w-full h-full" />
+          </div>
+
+          <div>
+            <div>{player.name}</div>
+          </div>
+
+          <div className="">
+            <button
+              onClick={() => handleOpen("create")}
+              className="bg-party-yellow text-white px-4 py-2 rounded mr-2"
+            >
+              建立遊戲
+            </button>
+
+            <button
+              onClick={() => handleOpen("join")}
+              className="bg-party-purple text-white px-4 py-2 rounded"
+            >
+              加入遊戲
+            </button>
+          </div>
+        </div>
+      )}
+
+      {popup && (
+        <PopupFrame>
+          <div className="relative">
+            <div>{popup == "create" ? <CreatePopup /> : <JoinPopup />}</div>
+
+            <div className=" relative cursor-auto">
+              <div
+                onClick={() => {
+                  handleClose();
+                }}
+              >
+                返回
+              </div>
+            </div>
+          </div>
+        </PopupFrame>
+      )}
     </div>
   );
 }

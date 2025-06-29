@@ -24,8 +24,9 @@ export async function fetchRoomListApi(): Promise<RoomListItem[]> {
 
 export async function createRoomApi(payload: {
   roomCode: string;
-  userId?: string;
-  maxMembers?: number;
+  player: { id?: string; name?: string };
+  maxPlayers: number;
+  isPublic: boolean;
 }) {
   try {
     const res = await fetch(`${API_BASE_URL}/room/create-room`, {
@@ -42,7 +43,10 @@ export async function createRoomApi(payload: {
 
 export async function joinRoomApi(payload: {
   roomCode: string;
-  userId?: string;
+  payload: {
+    id?: string;
+    name?: string;
+  };
 }) {
   try {
     const res = await fetch(`${API_BASE_URL}/room/join-room`, {
@@ -64,5 +68,22 @@ export async function fetchRoomDetailApi(roomCode: string) {
     return await res.json();
   } catch (e) {
     return null;
+  }
+}
+
+export async function checkPlayerApi(payload: {
+  roomCode: string;
+  playerId: string;
+}) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/room/check-player`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    return res.json();
+  } catch (e) {
+    console.error("檢查玩家失敗:", e);
+    return e;
   }
 }
